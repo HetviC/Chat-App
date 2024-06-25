@@ -45,7 +45,7 @@ export const getMessages = async(req,res)=>{
         const converations = await Conversation.findOne({ //find this conversation. Inside the converation we have message id and no message content
             participants: {$all: [senderId,userToChatId]},
         }).populate("messages")        //to get every messages from the messages array in converation instead of getting refernce id
-        if(!converations) res.status(200).json([]);
+        if(!converations) return res.status(200).json([]);
         const messages = converations.messages;
         res.status(200).json(messages);
         
