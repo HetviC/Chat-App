@@ -1,5 +1,6 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { getReceiverSocketId } from "../socket/socket.js";
 export const sendMessage = async(req,res)=>{
    //console.log("Message sent", req.params.id); //here id is used as in the url in message.rote.js we have written .id if we write userID then the same should come here
     try {
@@ -22,16 +23,19 @@ export const sendMessage = async(req,res)=>{
         });
         if(newMessage)
             conversation.messages.push(newMessage._id);
-        res.status(201).json(newMessage);
-
-        //SOCKET.io will go here
-
         //this will take time, as first conversation.save will be done and than newMessage.save
         //await conversation.save();
         //await newMessage.save();
 
         // this would be done in parallel
-        await Promise.all([conversation.save(),newMessage.save()]);
+        await Promise.all([conversation.save(),newMessage.save()]); 
+        //SOCKET.io will go here
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if(receiverId){
+            io.to(receiverSocketId).emit("newMessage",newMessage);
+        }
+
+        res.status(201).json(newMessage);
     } catch (error) {
         console.log("Error in send Message Contoller", error.message);
         res.status(500).json({error:"Internal Server Error"});
