@@ -7,7 +7,7 @@ export const getUsersForSidebar = async(req, res) =>{
         
         res.status(200).json(filteredUser)
     } catch (error) {
-        console.log("Error in getUser for Sidebar Contoller", error.message);
+        console.error("Error in getUser for Sidebar Contoller", error.message);
         res.status(500).json({error:"Internal Server Error"});
     }
 }
